@@ -6,7 +6,19 @@
 
   <p>Price: {{ book.price }}</p>
 
+  <p>Description: {{ book.description }}</p>
+
   <a class="" href="/add_to_cart/{{book.id}}">Add to Cart</a></b>
   <a class="" href="/add_to_wishlist/{{book.id}}">Add to Wishlist</a>
+
+  <p> Tell us what you think about this product: </p>
+<form method="POST" action ="">
+  {{ form.hidden_tag() }}
+  {{ form.review }}
+  {{ form.submit() }}
+</form>
+<p>Latest review: </p>
+<p> "{{ book.review }}" </p>
+
 
 {% endblock content %}

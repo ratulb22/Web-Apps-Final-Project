@@ -2,7 +2,7 @@ import os
 from flask import render_template, url_for, request, redirect, flash, session
 from shop import app, db
 from shop.models import Author, Book, User
-from shop.forms import RegistrationForm, LoginForm, SortingForm
+from shop.forms import RegistrationForm, LoginForm, SortingForm, ReviewForm
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -26,11 +26,19 @@ def home():
 def about():
     return render_template('about.html', title='About')
 
-@app.route("/book/<int:book_id>")
+@app.route("/book/<int:book_id>", methods=["GET", "POST"])
 def book(book_id):
     book = Book.query.get_or_404(book_id)
+    form = ReviewForm()
+    if form.validate_on_submit():
+        if form.review.data != "":
+            update_this = book.query.filter_by(id=book_id).first()
+            review = form.review.data
+            update_this.review = review
+            db.session.commit()
+            flash('Your review has been submitted. ')
 
-    return render_template('book.html', book=book)
+    return render_template('book.html', book=book, form=form)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -135,7 +143,7 @@ def wishlist_display():
         wishlist = {}
 
         total_price = 0
-        total_quantitys = 0
+        total_quantity = 0
         for item in items:
             book = Book.query.get_or_404(item)
 
@@ -160,7 +168,7 @@ def delete_book_wish(book_id):
 
     session["wishlist"].remove(book_id)
 
-    flash("The item has been removed from your shopping cart!")
+    flash("The item has been removed from your Wishlist!")
 
     session.modified = True
 
